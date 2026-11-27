@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NUTclient Launcher",
+  "version": "0.9.40",
+  "identifier": "com.nutclient.launcher",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build:app"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "NUTclient Launcher",
+        "width": 900,
+        "height": 640,
+        "minWidth": 640,
+        "minHeight": 480,
+        "resizable": true,
+        "decorations": false,
+        "shadow": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: https:; media-src 'self' blob: data: https:; connect-src 'self' ipc: https://github.com https://objects.githubusercontent.com http://ipc.localhost https://launchermeta.mojang.com https://piston-meta.mojang.com https://piston-data.mojang.com https://resources.download.minecraft.net https://login.microsoftonline.com https://user.auth.xboxlive.com https://xsts.auth.xboxlive.com https://api.minecraftservices.com https://api.mojang.com https://sessionserver.mojang.com https://api.ashcon.app https://api.modrinth.com https://cdn.modrinth.com https://crafatar.com https://textures.minecraft.net"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "resources": {
+      "resources/WebView2Loader.dll": "WebView2Loader.dll",
+      "resources/THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt",
+      "resources/nutagent.jar": "nutagent.jar",
+      "resources/mods/nutclient-1.21.11.jar": "mods/nutclient-1.21.11.jar",
+      "resources/mods/nutclient-26.2.jar": "mods/nutclient-26.2.jar",
+      "resources/mods/nutclient-26.3.jar": "mods/nutclient-26.3.jar",
+      "resources/mods/nutclient-classic-26.3.jar": "mods/nutclient-classic-26.3.jar",
+      "resources/mods/nutfix-neoforge-1.21.1.jar": "mods/nutfix-neoforge-1.21.1.jar"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlFOUFCQjQ0Q0Y3RkEyNjkKUldScG9uL1BSTHVhbmozcDBjMURDWmdIZE9TQjlGSS9SZm5meDRNYkEvSFZ4YUlzSkpidTM1ZGYK",
+      "endpoints": [
+        "https://github.com/Ginnheim20/NUTclient-Updates/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

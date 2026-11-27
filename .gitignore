@@ -1,0 +1,15 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+*.log
+.DS_Store
+
+# Große lokale Dateien – nicht nach GitHub
+release/
+**/run/
+**/run-26.2/
+**/build/
+**/.gradle/
+**/out/
+*.class

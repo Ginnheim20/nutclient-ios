@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <title>NUTclient Launcher</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <!-- SVG-Filter für echte Lichtbrechung an den Glaskanten -->
+    <svg class="glass-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="liquid-glass" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="2" seed="11" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="2.6" result="softNoise" />
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="18" xChannelSelector="R" yChannelSelector="G" result="disp" />
+        <feColorMatrix in="disp" type="saturate" values="1.25" />
+      </filter>
+      <filter id="liquid-glass-strong" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.009 0.013" numOctaves="2" seed="4" result="noise" />
+        <feGaussianBlur in="noise" stdDeviation="3" result="softNoise" />
+        <feDisplacementMap in="SourceGraphic" in2="softNoise" scale="34" xChannelSelector="R" yChannelSelector="G" result="disp" />
+        <feColorMatrix in="disp" type="saturate" values="1.4" />
+      </filter>
+    </svg>
+
+    <!-- Hintergrundvideo (stummgeschaltete Dauerschleife, siehe src/bgvideo.ts) -->
+    <video id="bg-video" class="bg-video" muted loop playsinline hidden></video>
+
+    <div class="app">
+      <!-- Linke Icon-Leiste -->
+      <nav class="rail">
+        <div class="rail-group rail-top">
+          <button class="rail-btn" data-nav="home" title="Startbildschirm" aria-label="Startbildschirm"></button>
+          <button class="rail-btn" data-panel="instances" title="Select" aria-label="Instanz auswählen"></button>
+          <button class="rail-btn" data-panel="cosmetics" title="Skin &amp; Cosmetics" aria-label="Skin und Cosmetics"></button>
+          <button class="rail-btn" data-panel="content" title="Inhalte hinzufügen" aria-label="Inhalte hinzufügen"></button>
+          <button class="rail-btn" data-panel="friends" title="Freunde" aria-label="Freunde"></button>
+        </div>
+        <div class="rail-group rail-bottom">
+          <button class="rail-btn" data-panel="settings" title="Einstellungen" aria-label="Einstellungen"></button>
+        </div>
+      </nav>
+
+      <!-- Hauptbereich -->
+      <div class="main">
+        <header class="topbar" data-tauri-drag-region>
+          <button class="rail-btn top-btn" id="btn-notifications" title="Neuigkeiten" aria-label="Neuigkeiten"></button>
+          <div class="top-spacer" data-tauri-drag-region></div>
+          <!-- Dynamic Island: Uhr / Systemwiedergabe / Discord-Call (src/nowplaying.ts) -->
+          <div class="media-widget" id="media-widget" hidden></div>
+          <div class="top-spacer" data-tauri-drag-region></div>
+          <!-- Fenster-Steuerung (nur im Tauri-Fenster, siehe src/titlebar.ts) -->
+          <div class="win-controls" id="win-controls" hidden>
+            <button class="tb-btn" id="tb-min" type="button" aria-label="Minimieren" title="Minimieren">
+              <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8" /></svg>
+            </button>
+            <button class="tb-btn" id="tb-max" type="button" aria-label="Maximieren" title="Maximieren">
+              <svg class="tb-ico-max" viewBox="0 0 12 12" aria-hidden="true"><rect x="2.2" y="2.2" width="7.6" height="7.6" rx="1.2" /></svg>
+              <svg class="tb-ico-restore" viewBox="0 0 12 12" aria-hidden="true"><path d="M3.4 4.6h4.9V9.5H3.4z" /><path d="M4.9 4.6V3.1h4.9V8h-1.5" /></svg>
+            </button>
+            <button class="tb-btn tb-close" id="tb-close" type="button" aria-label="Schließen" title="Schließen">
+              <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" /></svg>
+            </button>
+          </div>
+        </header>
+
+        <section class="stage">
+          <div class="hero">
+            <div class="nametag" id="nametag" hidden></div>
+            <div class="skin-viewer" id="skin-viewer"></div>
+
+            <div class="play-bar">
+              <button class="play-btn" id="btn-play" title="Zuletzt gespielte Instanz starten">
+                <span class="play-ico" aria-hidden="true"></span>
+                <span class="play-label" id="play-label">Spielen</span>
+              </button>
+              <button class="play-more" id="btn-play-more" title="Instanzen öffnen" aria-label="Instanzen öffnen"></button>
+            </div>
+          </div>
+
+          <button class="rail-btn account-chip" id="account-chip" title="Konto wechseln" aria-label="Konto">
+            <span class="rail-ico" id="account-head-wrap"><img class="account-head" id="account-head" alt="" /></span>
+            <span class="rail-txt" id="account-chip-name">Anmelden</span>
+          </button>
+        </section>
+
+        <div class="launch-status" id="launch-status" hidden></div>
+      </div>
+    </div>
+
+    <!-- Panel-Host (Overlays) -->
+    <div class="panel-host" id="panel-host" hidden>
+      <div class="panel-backdrop" data-close></div>
+      <aside class="panel" id="panel" role="dialog" aria-modal="true">
+        <button class="panel-edge" id="panel-edge" type="button" aria-label="Panel vergrößern / verkleinern" title="Vergrößern">
+          <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 3l5 5-5 5"/><path d="M9 3l4 5-4 5" opacity="0.6"/>
+          </svg>
+        </button>
+        <header class="panel-header">
+          <h2 id="panel-title">Panel</h2>
+          <button class="panel-close" data-close aria-label="Schließen">✕</button>
+        </header>
+        <div class="panel-body" id="panel-body"></div>
+      </aside>
+    </div>
+
+    <div class="toast-host" id="toast-host"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
